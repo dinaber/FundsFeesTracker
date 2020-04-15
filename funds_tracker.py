@@ -61,22 +61,22 @@ def main(output_mode, test_mode, funds_info_file, output_file, pushbullet_key):
 			messages.append('* If any of your fees changed, update them in the csv to avoid getting repeated messages')
 			messages.append('* If you recieved a warning regarding one of the funds maybe something is FISHY. Either correct it or remove it from the list')
 			text = '\n'.join(messages)
-		if output_mode=='push':
+		if output_mode=='push' or output_mode=='both':
 			pb = PushBullet(pushbullet_key)
 			push = pb.push_note(title,text)
-		else:
-			f = open("output_file", "w")
-			today = date.today()
-			f.write(f"Date: {today}")
-			f.write(text)
-			f.write(f'\n\n')
-			f.close()
+		if output_mode=='file' or output_mode=='both':
+			with open(output_file, "a") as f:
+				today = date.today()
+				f.write(f"Date: {today}\n")
+				f.write(text)
+				f.write(f'\n\n')
+
 
 
 if __name__=="__main__":
 	# Define the parser
 	parser = argparse.ArgumentParser(description='Funds fee tracker app')
-	parser.add_argument('--mode', action="store", dest='output_mode', default='file', choices=['file', 'push'], help='Choose your output form, "file" (default) to write to file or "push" for pushbullet')
+	parser.add_argument('--mode', action="store", dest='output_mode', default='file', choices=['file', 'push', 'both'], help='Choose your output form, "file" (default) to write to file or "push" for pushbullet')
 	parser.add_argument('--test', action="store", dest='test_mode', default='off', choices=['on', 'off'], help='Run in test mode to check that it works')
 	parser.add_argument('--p_key', action="store", dest='pushbullet_key', default=None, help='Your pushbullet key (optional). Only if mode is push')
 	parser.add_argument('--funds', action="store", dest='funds_info_file', default='funds_fees.csv', help='Full path to funds csv file. default: funds_fees.csv (searches in current directory)')
